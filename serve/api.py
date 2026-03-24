@@ -81,3 +81,7 @@ async def get_response(item: Item):
     # 由于 API 存在即时性问题，不能支持历史链
     else:
         return "API 不支持历史链"
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)

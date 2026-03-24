@@ -2,10 +2,10 @@
 
 ## 项目概述
 
-这是一个基于大语言模型（LLM）的个人知识库助手项目，使用 LangChain 框架构建。项目实现了 RAG（检索增强生成）架构，能够基于 Datawhale 开源项目的 README 文档进行智能问答。用户可以上传自己的知识库文件，系统会自动将其向量化并建立索引，然后通过向量检索与大语言模型相结合，提供准确的答案。
+这是一个基于大语言模型（LLM）的个人知识库助手项目，使用 LangChain 框架构建。项目实现了 RAG（检索增强生成）架构，能够基于用户上传的知识库文档进行智能问答。系统支持多种大模型 API，包括 OpenAI、文心一言、讯飞星火、智谱 AI 等，并提供本地 API 服务和 Gradio Web 界面。
 
 **核心特性：**
-- 支持多种 LLM API：OpenAI（GPT-3.5/GPT-4）、文心一言、讯飞星火、智谱 AI
+- 支持多种 LLM API：OpenAI（GPT-3.5/GPT-4）、文心一言、讯飞星火、智谱 AI、阿里云千问
 - 支持多种 Embedding：本地 m3e 模型、OpenAI、智谱 AI
 - 支持带历史记忆和不带历史记忆的问答模式
 - 提供本地 API 服务和 Gradio Web 界面
@@ -21,11 +21,13 @@
   - 文心一言：ERNIE-Bot、ERNIE-Bot-4、ERNIE-Bot-turbo
   - 讯飞星火：Spark-1.5、Spark-2.0（使用 WebSocket）
   - 智谱 AI：chatglm_pro、chatglm_std、chatglm_lite
+  - 阿里云千问：qwen-turbo、qwen-turbo-lite、qwen-plus、qwen-max
 - **具体实现文件**：
   - `self_llm.py`：自定义 LLM 基类
   - `zhipuai_llm.py`：智谱 AI 的 LangChain 集成
   - `spark_llm.py`：讯飞星火的 WebSocket 实现
   - `wenxin_llm.py`：百度文心的 API 封装
+  - `qwen_llm.py`：阿里云千问的 API 封装
 
 ### 2. 数据层（`embedding/`）
 - **call_embedding.py**：统一的文本嵌入接口
@@ -80,8 +82,8 @@
 
 1. **克隆仓库**
 ```bash
-git clone https://github.com/logan-zou/Chat_with_Datawhale_langchain.git
-cd Chat_with_Datawhale_langchain
+git clone https://github.com/hg-fighting/llm.git
+cd llm
 ```
 
 2. **创建 Conda 环境**
@@ -92,7 +94,7 @@ conda activate llm-universe
 
 3. **安装依赖**
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 4. **配置环境变量**
@@ -113,34 +115,30 @@ spark_api_secret=your_spark_api_secret
 
 # 智谱 AI
 ZHIPUAI_API_KEY=your_zhipuai_api_key
+
+# 阿里云千问
+DASHSCOPE_API_KEY=your_qwen_api_key
 ```
 
 ## 运行方式
 
 ### 方式一：启动 API 服务
 
-**Windows 系统：**
 ```bash
 cd serve
 python api.py
 ```
 
-**Linux 系统：**
-```bash
-cd serve
-uvicorn api:app --reload
-```
-
-API 服务默认在 `http://localhost:8000` 启动，提供 `/` POST 接口用于问答。
+API 服务默认在 `http://127.0.0.1:8000` 启动，提供 `/` POST 接口用于问答。
 
 ### 方式二：启动 Gradio Web 界面
 
 ```bash
 cd serve
-python run_gradio.py -model_name='chatglm_std' -embedding_model='m3e' -db_path='./knowledge_db' -persist_path='./vector_db'
+python run_gradio.py -model_name='chatglm_std' -embedding_model='m3e' -db_path='../knowledge_db' -persist_path='../vector_db'
 ```
 
-Gradio 界面会在浏览器中自动打开。
+Gradio 界面会在浏览器中自动打开（默认端口 7861）。
 
 ## 使用说明
 
@@ -173,7 +171,7 @@ Gradio 界面会在浏览器中自动打开。
 ```python
 import requests
 
-url = "http://localhost:8000/"
+url = "http://127.0.0.1:8000/"
 data = {
     "prompt": "什么是南瓜书？",
     "model": "chatglm_std",
@@ -228,7 +226,7 @@ print(response.json())
 
 ### 目录结构规范
 ```
-Chat_with_Datawhale_langchain/
+llm/
 ├── database/          # 数据库相关操作
 ├── embedding/         # 文本嵌入
 ├── llm/              # 大模型调用封装
@@ -274,9 +272,9 @@ Chat_with_Datawhale_langchain/
 ## 技术栈总结
 
 - **语言**：Python 3.9+
-- **框架**：LangChain 0.0.292
+- **框架**：LangChain 0.1.10, langchain-community 0.0.28
 - **向量数据库**：ChromaDB 0.3.29
-- **Web 框架**：FastAPI 0.85.1, Gradio 3.40.1
+- **Web 框架**：FastAPI 0.85.1, Gradio 3.50.0
 - **文本处理**：Unstructured 0.9.0
 - **PDF 处理**：PyMuPDF 1.23.6
 - **其他重要库**：
@@ -284,6 +282,7 @@ Chat_with_Datawhale_langchain/
   - zhipuai 1.0.7
   - python-dotenv 1.0.0
   - loguru 0.7.2
+  - uvicorn 0.24.0.post1
 
 ## 致谢
 

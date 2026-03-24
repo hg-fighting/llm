@@ -52,6 +52,8 @@ def get_completion(prompt :str, model :str, temperature=0.1,api_key=None, secret
         return get_completion_spark(prompt, model, temperature, api_key, appid, api_secret, max_tokens)
     elif model in ["chatglm_pro", "chatglm_std", "chatglm_lite"]:
         return get_completion_glm(prompt, model, temperature, api_key, max_tokens)
+    elif model in ["qwen-turbo", "qwen-turbo-lite", "qwen-plus", "qwen-max"]:
+        return get_completion_qwen(prompt, model, temperature, api_key, max_tokens)
     else:
         return "不正确的模型"
     
@@ -142,6 +144,27 @@ def get_completion_glm(prompt : str, model : str, temperature : float, api_key:s
         max_tokens=max_tokens
         )
     return response["data"]["choices"][0]["content"].strip('"').strip(" ")
+
+def get_completion_qwen(prompt : str, model : str, temperature : float, api_key:str, max_tokens : int):
+    # 封装阿里云千问API
+    if api_key == None:
+        api_key = parse_llm_api_key("qwen")
+
+    # 设置API密钥和基础URL（使用旧版openai API）
+    openai.api_key = api_key
+    openai.api_base = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+
+    # 调用API
+    messages = [{"role": "user", "content": prompt}]
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=temperature,
+        max_tokens=max_tokens
+    )
+
+    # 返回结果
+    return response.choices[0].message.content
 
 # def getText(role, content, text = []):
 #     # role 是指定角色，content 是 prompt 内容
@@ -314,5 +337,8 @@ def parse_llm_api_key(model:str, env_file:dict()=None):
     elif model == "zhipuai":
         return get_from_dict_or_env(env_file, "zhipuai_api_key", "ZHIPUAI_API_KEY")
         # return env_file["ZHIPUAI_API_KEY"]
+    elif model == "qwen":
+        return get_from_dict_or_env(env_file, "qwen_api_key", "DASHSCOPE_API_KEY")
+        # return env_file["DASHSCOPE_API_KEY"]
     else:
         raise ValueError(f"model{model} not support!!!")

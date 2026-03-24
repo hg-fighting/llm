@@ -24,7 +24,8 @@ LLM_MODEL_DICT = {
     "openai": ["gpt-3.5-turbo", "gpt-3.5-turbo-16k-0613", "gpt-3.5-turbo-0613", "gpt-4", "gpt-4-32k"],
     "wenxin": ["ERNIE-Bot", "ERNIE-Bot-4", "ERNIE-Bot-turbo"],
     "xinhuo": ["Spark-1.5", "Spark-2.0"],
-    "zhipuai": ["chatglm_pro", "chatglm_std", "chatglm_lite"]
+    "zhipuai": ["chatglm_pro", "chatglm_std", "chatglm_lite"],
+    "qwen": ["qwen-turbo", "qwen-turbo-lite", "qwen-plus", "qwen-max"]
 }
 
 
@@ -32,12 +33,12 @@ LLM_MODEL_LIST = sum(list(LLM_MODEL_DICT.values()),[])
 INIT_LLM = "chatglm_std"
 EMBEDDING_MODEL_LIST = ['zhipuai', 'openai', 'm3e']
 INIT_EMBEDDING_MODEL = "m3e"
-DEFAULT_DB_PATH = "./knowledge_db"
-DEFAULT_PERSIST_PATH = "./vector_db/chroma"
-AIGC_AVATAR_PATH = "./figures/aigc_avatar.png"
-DATAWHALE_AVATAR_PATH = "./figures/datawhale_avatar.png"
-AIGC_LOGO_PATH = "./figures/aigc_logo.png"
-DATAWHALE_LOGO_PATH = "./figures/datawhale_logo.png"
+DEFAULT_DB_PATH = "../knowledge_db"
+DEFAULT_PERSIST_PATH = "../vector_db/chroma"
+AIGC_AVATAR_PATH = "../figures/aigc_avatar.png"
+DATAWHALE_AVATAR_PATH = "../figures/datawhale_avatar.png"
+AIGC_LOGO_PATH = "../figures/aigc_logo.png"
+DATAWHALE_LOGO_PATH = "../figures/datawhale_logo.png"
 
 def get_model_by_platform(platform):
     return LLM_MODEL_DICT.get(platform, "")
@@ -247,4 +248,4 @@ gr.close_all()
 # 启动新的 Gradio 应用，设置分享功能为 True，并使用环境变量 PORT1 指定服务器端口。
 # demo.launch(share=True, server_port=int(os.environ['PORT1']))
 # 直接启动
-demo.launch(server_name="0.0.0.0", server_port=7861, share=True)
+demo.launch(server_name="127.0.0.1", server_port=7861, share=True)
